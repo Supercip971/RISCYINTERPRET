@@ -1,0 +1,16 @@
+
+./helloworld:     format de fichier elf64-littleriscv
+
+
+Déassemblage de la section .text :
+
+00000000000100b0 <_start>:
+   100b0:	00100513          	li	a0,1
+   100b4:	00001597          	auipc	a1,0x1
+   100b8:	02058593          	addi	a1,a1,32 # 110d4 <__DATA_BEGIN__>
+   100bc:	00d00613          	li	a2,13
+   100c0:	04000893          	li	a7,64
+   100c4:	00000073          	ecall
+   100c8:	00000513          	li	a0,0
+   100cc:	05d00893          	li	a7,93
+   100d0:	00000073          	ecall
