@@ -13,7 +13,7 @@ public:
     uint32_t raw_data = 0;
 
     risc_expression_code();
-    risc_expression_code(uint64_t val);
+    risc_expression_code(uint32_t val);
 
     inline uint8_t read_opcode(){
         return raw_data & 0x7f;
@@ -21,7 +21,7 @@ public:
     }
 
     inline uint8_t read_rd(){
-        return (raw_data & 0xf8) >> 7;
+        return (raw_data & 0xf80) >> 7;
         // 00000000000000000000111110000000
     }
 

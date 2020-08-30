@@ -1,5 +1,7 @@
 #include <system/risc_context.h>
 #include <system/risc_expression.h>
+#include <system/risc_assembly_expression.h>
+#include <byteswap.h>
 RISC_context::RISC_context(uint64_t start, void* memory, uint64_t memory_lenght)
 {
     _current_idx = start;
@@ -13,8 +15,15 @@ RISC_context::RISC_context()
 
 }
 
+RISC_register* RISC_context::get_register(uint32_t id){
+    if(id >31){
+        return nullptr;
+    }else{
+        return x_regs[id];
+    }
+}
 uint64_t RISC_context::read_memory(uint64_t address){
-    if(address > memory_lenght){
+    if(address >= memory_lenght){
         error("trying to read higher than the memory limit \n");
         return 0;
     }
@@ -30,18 +39,21 @@ void RISC_context::write_memory(uint64_t address, uint64_t value){
     *content = value;
 }
 void RISC_context::execute(){
+    static int fallback = 0;
     printf("executing...");
     while(_current_idx < memory_lenght){
         _current_idx = next_idx;
         next_idx += 0x4;
-        if(ram[_current_idx] == 0){
-            break;
+        if(risc_expression_code(read_memory(_current_idx)).read_opcode() == 0){
+
+                return;
+
         }
-        risc_expression* exp = get_expression(read_memory(_current_idx));
+        risc_expression* exp = get_expression(risc_expression_code(read_memory(_current_idx)));
         if(exp != nullptr){
-            exp->execute(this, read_memory(_current_idx));
+            exp->execute(this, risc_expression_code(read_memory(_current_idx)));
         }
-        free(exp);
+        delete(exp);
     }
 }
 int RISC_context::init(){

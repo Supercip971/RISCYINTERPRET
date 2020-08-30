@@ -2,7 +2,7 @@
 
 
 risc_expression_code::risc_expression_code(){};
-risc_expression_code::risc_expression_code(uint64_t val){raw_data = val;};
+risc_expression_code::risc_expression_code(uint32_t val){raw_data = val;};
 risc_expression::risc_expression()
 {
 
@@ -17,6 +17,10 @@ void risc_expression::execute(RISC_context* context, risc_expression_code code){
 
 
 void R_add_expression::execute(RISC_context* context, risc_expression_code code){
+
+
+    printf("rs1 = %i \n", code.read_rs1());
+    printf("rs2 = %i \n", code.read_rs1());
     printf("error trying to execute an not implemented expression %s \n", typeid(*this).name());
 }
 
@@ -60,7 +64,21 @@ void R_sltu_expression::execute(RISC_context* context, risc_expression_code code
 
 
 void I_addi_expression::execute(RISC_context* context, risc_expression_code code){
-    printf("error trying to execute an not implemented expression %s \n", typeid(*this).name());
+    RISC_register* rd = context->get_register(code.read_rd());
+     RISC_register* rs1 = context->get_register(code.read_rs1());
+     uint64_t    imm = code.I_read_imm();
+      if(rd == nullptr){
+          return; // trying to write to regs 0
+      }
+    printf("%s (%i) = %s (%i) + %s (%i) \n",
+           rd->get_abi().c_str(),
+           rd->get(),
+           rs1->get_abi().c_str(),
+           rs1->get(),
+           "imm",
+           imm );
+    rd->set(rs1->get() + (int)imm);
+
 }
 void I_subi_expression::execute(RISC_context* context, risc_expression_code code){
     printf("error trying to execute an not implemented expression %s \n", typeid(*this).name());

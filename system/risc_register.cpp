@@ -27,7 +27,7 @@ x0_register::x0_register(){
     base_value = 0x0;
 }
 void x0_register::set(uint64_t value){
-    parent_data->error("trying to change x0 value");
+    //parent_data->error("trying to change x0 value");
   //  base_value = value;
 }
 

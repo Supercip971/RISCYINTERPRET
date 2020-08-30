@@ -13,6 +13,9 @@ public:
     void write_memory(uint64_t address, uint64_t value);
     RISC_register* x_regs[32];
     RISC_register* f_regs[32]; // unused
+
+
+    RISC_register* get_register(uint32_t id);
     uint64_t stack = 0;
     int init();
     uint64_t next_idx; // used with expression when they need to change the next index
