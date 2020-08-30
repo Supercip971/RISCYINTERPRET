@@ -8,6 +8,9 @@ class RISC_context
     uint8_t* ram;
     uint64_t memory_lenght;
 public:
+
+    uint64_t read_memory(uint64_t address);
+    void write_memory(uint64_t address, uint64_t value);
     RISC_register* x_regs[32];
     RISC_register* f_regs[32]; // unused
     uint64_t stack = 0;

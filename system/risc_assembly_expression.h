@@ -5,6 +5,67 @@
 
 
 
+class risc_expression_code{
+
+
+public:
+    uint64_t where = 0;
+    uint32_t raw_data = 0;
+
+    risc_expression_code();
+    risc_expression_code(uint64_t val);
+
+    inline uint8_t read_opcode(){
+        return raw_data & 0x7f;
+        // 00000000000000000000000001111111
+    }
+
+    inline uint8_t read_rd(){
+        return (raw_data & 0xf8) >> 7;
+        // 00000000000000000000111110000000
+    }
+
+    inline uint8_t read_f3(){
+        return (raw_data & 0x7000) >> 12;
+        // 00000000000000000111000000000000
+    }
+
+    inline uint8_t read_rs1(){
+        return (raw_data & 0xf8000) >> 15;
+        // 00000000000011111000000000000000
+    }
+
+    inline uint8_t read_rs2(){
+        return (raw_data & 0x1f00000) >> 20;
+        // 00000001111100000000000000000000
+    }
+
+    inline uint8_t read_f7(){
+        return (raw_data & 0xfe000000) >> 25;
+       // 11111110000000000000000000000000
+    }
+
+    inline uint8_t I_read_imm(){
+        return (raw_data & 0xfff00000) >> 20;
+       // 11111111111100000000000000000000
+    }
+
+    inline uint8_t SB_read_imm_start(){
+        return (raw_data & 0xf8) >> 7;
+        // 00000000000000000000111110000000
+    }
+
+    inline uint8_t SB_read_imm_end(){
+        return (raw_data & 0xfe000000) >> 25;
+       // 11111110000000000000000000000000
+    }
+
+    inline uint8_t UJ_read_imm(){
+        return (raw_data & 0xfffff000) >> 12;
+        // 11111111111111111111000000000000
+    }
+};
+
 
 
 class risc_expression
@@ -19,7 +80,6 @@ public:
 #define DEFINE_EXPRESSION(name) \
     class name :public risc_expression { \
     public: \
-    name();\
     void execute(RISC_context* context, risc_expression_code code) override; \
     };
 // add expression

@@ -5,10 +5,14 @@
 #include <cstdlib>
 #include <cstring>
 #include <system/risc_context.h>
+#include <byteswap.h>
 
 
 interpreter::interpreter()
 {
+
+}
+void interpreter::swap_little_endian(){
 
 }
 void interpreter::load_segment(uint64_t source, uint64_t size, uint64_t dest, uint64_t destsize){
@@ -31,7 +35,17 @@ void interpreter::load_elf(){
 
     printf("loading elf \n");
     Elf64_Phdr* p_entry = (Elf64_Phdr*)((uint64_t)interpreter_raw_data + header->e_phoff);
+    if(header->e_ident[0x5] == 1){
+        printf("file in little endian \n");
+        use_little_endian = true;
+    }else if(header->e_ident[0x5] == 2){
+        printf("file in big endian \n");
+        use_little_endian = false;
 
+    }else{
+        printf("invalid endian file");
+        exit(2);
+    }
     printf("loading elf 1 \n");
     uint64_t elf_vaddr_start = 0;
         uint64_t elf_vaddr_end = 0;
@@ -54,8 +68,10 @@ void interpreter::load_elf(){
 void interpreter::start(){
     RISC_context context;
     context = RISC_context(start_addr, (void*)interpreter_ram, ram_size);
-    printf("loading context");
+    printf("loading context \n");
     context.init();
+    printf("executing context \n");
+    context.execute();
 }
 void interpreter::load(std::string file_path){
 

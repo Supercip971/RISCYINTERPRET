@@ -1,0 +1,12 @@
+
+*.out
+build/RISCYINTERPRETER
+*.o
+prgDump.txt
+riscyinterpret.cflags
+riscyinterpret.config
+riscyinterpret.creator
+riscyinterpret.creator.user
+riscyinterpret.cxxflags
+riscyinterpret.files
+riscyinterpret.includes

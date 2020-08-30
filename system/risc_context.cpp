@@ -1,8 +1,9 @@
 #include <system/risc_context.h>
-
+#include <system/risc_expression.h>
 RISC_context::RISC_context(uint64_t start, void* memory, uint64_t memory_lenght)
 {
     _current_idx = start;
+    next_idx = start;
     ram = (uint8_t*) memory;
     this->memory_lenght = memory_lenght;
 }
@@ -12,8 +13,36 @@ RISC_context::RISC_context()
 
 }
 
+uint64_t RISC_context::read_memory(uint64_t address){
+    if(address > memory_lenght){
+        error("trying to read higher than the memory limit \n");
+        return 0;
+    }
+    uint64_t* content = (uint64_t*)&ram[address];
+    return  *content;
+}
+void RISC_context::write_memory(uint64_t address, uint64_t value){
+    if(address > memory_lenght){
+        error("trying to write higher than the memory limit \n");
+        return;
+    }
+    uint64_t* content = (uint64_t*)&ram[address];
+    *content = value;
+}
 void RISC_context::execute(){
-
+    printf("executing...");
+    while(_current_idx < memory_lenght){
+        _current_idx = next_idx;
+        next_idx += 0x4;
+        if(ram[_current_idx] == 0){
+            break;
+        }
+        risc_expression* exp = get_expression(read_memory(_current_idx));
+        if(exp != nullptr){
+            exp->execute(this, read_memory(_current_idx));
+        }
+        free(exp);
+    }
 }
 int RISC_context::init(){
     printf("RISC context loading \n");
@@ -58,9 +87,8 @@ int RISC_context::init(){
     }
     printf("RISC context loaded [x] registers \n ");
 
-    for(uint32_t i = _current_idx; i <_current_idx+ 100; i+= 4){
-        printf("hey : %x\n ", *((uint32_t*)&ram[i]) );
-    }
+
+
 
     return 0;
 }
@@ -68,5 +96,5 @@ void RISC_context::error(std::string error_code){
 
     printf("[ RISC ] error : %s ", error_code.c_str());
 
-    exit(1);
+    //exit(1);
 }

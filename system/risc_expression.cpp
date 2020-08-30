@@ -38,7 +38,7 @@ risc_expression* get_expression_51(risc_expression_code execute_code){
             return(risc_expression*) (new R_sltu_expression());
             break;
         default:
-            printf("un handled expression OPCODE %i", execute_code.read_f3());
+            printf("un handled expression OPCODE %i/%i \n", execute_code.read_opcode(), execute_code.read_f3());
     }
     return nullptr;
 }
@@ -72,13 +72,108 @@ risc_expression* get_expression_19(risc_expression_code execute_code){
             }
             break;
         case O19_SLTI:
-            return(risc_expression*) (new R_or_expression());
+            return(risc_expression*) (new I_slti_expression());
             break;
         case O19_SLTIU:
-            return(risc_expression*) (new R_or_expression());
+            return(risc_expression*) (new I_sltiu_expression());
             break;
         default:
-                printf("un handled expression OPCODE %i", execute_code.read_f3());
+                printf("un handled expression OPCODE %i/%i \n", execute_code.read_opcode(), execute_code.read_f3());
+    }
+    return nullptr;
+}
+
+risc_expression* get_expression_3(risc_expression_code execute_code){
+    switch (execute_code.read_f3()) { // maybe doing an array would be faster ?
+        case OP3_LB:
+            return(risc_expression*) (new I_lb_expression());
+            break;
+
+        case OP3_LH:
+            return(risc_expression*) (new I_lh_expression());
+            break;
+
+        case OP3_LW:
+            return(risc_expression*) (new I_lw_expression());
+            break;
+
+        case OP3_LBU:
+            return(risc_expression*) (new I_lbu_expression());
+            break;
+
+        case OP3_LHU:
+            return(risc_expression*) (new I_lhu_expression());
+            break;
+
+        default:
+                printf("un handled expression OPCODE %i/%i \n", execute_code.read_opcode(), execute_code.read_f3());
+    }
+    return nullptr;
+}
+risc_expression* get_expression_35(risc_expression_code execute_code){
+    switch (execute_code.read_f3()) { // maybe doing an array would be faster ?
+        case OP35_SB:
+            return(risc_expression*) (new S_sb_expression());
+            break;
+
+        case OP35_SH:
+            return(risc_expression*) (new S_sh_expression());
+            break;
+
+        case OP35_SW:
+            return(risc_expression*) (new S_sw_expression());
+            break;
+
+
+        default:
+                printf("un handled expression OPCODE %i/%i \n", execute_code.read_opcode(), execute_code.read_f3());
+    }
+    return nullptr;
+}
+risc_expression* get_expression_99(risc_expression_code execute_code){
+    switch (execute_code.read_f3()) { // maybe doing an array would be faster ?
+        case OP99_BEQ:
+            return(risc_expression*) (new B_beq_expression());
+            break;
+        case OP99_BNE:
+            return(risc_expression*) (new B_bne_expression());
+            break;
+        case OP99_BLT:
+            return(risc_expression*) (new B_blt_expression());
+            break;
+        case OP99_BGE:
+            return(risc_expression*) (new B_bge_expression());
+            break;
+        case OP99_BLTU:
+            return(risc_expression*) (new B_bltu_expression());
+            break;
+        case OP99_BGEU:
+            return(risc_expression*) (new B_bgeu_expression());
+            break;
+        default:
+                printf("un handled expression OPCODE %i/%i \n", execute_code.read_opcode(), execute_code.read_f3());
+    }
+    return nullptr;
+}
+risc_expression* get_expression_MISC(risc_expression_code execute_code){
+    switch (execute_code.read_opcode()) { // maybe doing an array would be faster ?
+        case OPMISC_JAL:
+            return(risc_expression*) (new J_jal_expression());
+            break;
+        case OPMISC_JALR:
+            return(risc_expression*) (new I_jalr_expression());
+            break;
+        case OPMISC_LUI:
+            return(risc_expression*) (new U_lui_expression());
+            break;
+        case OPMISC_AUIPC:
+            return(risc_expression*) (new U_auipc_expression());
+            break;
+        case OPMISC_ECALL:
+            return(risc_expression*) (new I_ecall_expression());
+            break;
+        default:
+                printf("un handled expression OPCODE %i \n", execute_code.read_opcode());
     }
     return nullptr;
 }
@@ -87,6 +182,10 @@ risc_expression* get_expression(risc_expression_code execute_code){
         return get_expression_51(execute_code);
     }else if(execute_code.read_opcode() == 0b010011){
         return get_expression_19(execute_code);
+    }else if(execute_code.read_opcode() == 0b000011){
+        return get_expression_3(execute_code);
+    }else {
+        return get_expression_MISC(execute_code);
     }
     return 0x0;
 }

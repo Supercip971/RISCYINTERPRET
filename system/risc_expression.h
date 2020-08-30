@@ -1,7 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include <system/risc_assembly_expression.h>
-enum OP51_instructions{
+enum OP51_instructions{ //general 1
     O51_ADD = 0x0,
     O51_SUB = 0x0,
     O51_XOR = 0x4,
@@ -14,7 +14,7 @@ enum OP51_instructions{
     O51_SLTU = 0x3
 };
 
-enum OP19_instructions{
+enum OP19_instructions{ // general Imm
     O19_ADDI = 0x0,
     O19_XORI= 0x4,
     O19_ORI = 0x6,
@@ -26,72 +26,37 @@ enum OP19_instructions{
     O19_SLTIU= 0x3,
 };
 
-
-
-
-
-
-class risc_expression_code{
-
-
-public:
-    uint64_t where = 0;
-    uint32_t raw_data = 0;
-
-    risc_expression_code();
-    risc_expression_code(uint64_t val);
-
-    inline uint8_t read_opcode(){
-        return raw_data & 0x7f;
-        // 00000000000000000000000001111111
-    }
-
-    inline uint8_t read_rd(){
-        return (raw_data & 0xf8) >> 7;
-        // 00000000000000000000111110000000
-    }
-
-    inline uint8_t read_f3(){
-        return (raw_data & 0x7000) >> 12;
-        // 00000000000000000111000000000000
-    }
-
-    inline uint8_t read_rs1(){
-        return (raw_data & 0xf8000) >> 15;
-        // 00000000000011111000000000000000
-    }
-
-    inline uint8_t read_rs2(){
-        return (raw_data & 0x1f00000) >> 20;
-        // 00000001111100000000000000000000
-    }
-
-    inline uint8_t read_f7(){
-        return (raw_data & 0xfe000000) >> 25;
-       // 11111110000000000000000000000000
-    }
-
-    inline uint8_t I_read_imm(){
-        return (raw_data & 0xfff00000) >> 20;
-       // 11111111111100000000000000000000
-    }
-
-    inline uint8_t SB_read_imm_start(){
-        return (raw_data & 0xf8) >> 7;
-        // 00000000000000000000111110000000
-    }
-
-    inline uint8_t SB_read_imm_end(){
-        return (raw_data & 0xfe000000) >> 25;
-       // 11111110000000000000000000000000
-    }
-
-    inline uint8_t UJ_read_imm(){
-        return (raw_data & 0xfffff000) >> 12;
-        // 11111111111111111111000000000000
-    }
+enum OP3_instructions{ // load
+    OP3_LB = 0x0,
+    OP3_LH= 0x1,
+    OP3_LW = 0x2,
+    OP3_LBU = 0x4,
+    OP3_LHU = 0x5,
 };
 
+enum OP35_instructions{ // Store
+    OP35_SB = 0x0,
+    OP35_SH= 0x1,
+    OP35_SW = 0x2,
+};
 
+enum OP99_instruction{ // branch
+    OP99_BEQ = 0x0,
+    OP99_BNE = 0x1,
+    OP99_BLT = 0x4,
+    OP99_BGE = 0x5,
+    OP99_BLTU = 0x6,
+    OP99_BGEU = 0x7,
+};
+enum OPMISC_instruction{ // here we only count the OP_code
+   OPMISC_JAL = 111,
+   OPMISC_JALR  = 103,
+    OPMISC_LUI = 55,
+    OPMISC_AUIPC = 23,
+    OPMISC_ECALL = 115, // with imm = 0x0
+    OPMISC_EBREAK = 115, // with imm = 0x1 but we doesn't support break yet
+};
+class risc_expression;
+class risc_expression_code;
 
 risc_expression* get_expression(risc_expression_code execute_code);
