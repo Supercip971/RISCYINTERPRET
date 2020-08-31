@@ -24,6 +24,7 @@ RISC_register* RISC_context::get_register(uint32_t id){
 }
 uint64_t RISC_context::read_memory(uint64_t address){
     if(address >= memory_lenght){
+        printf("while reading address %xl \n", address);
         error("trying to read higher than the memory limit \n");
         return 0;
     }
@@ -32,20 +33,26 @@ uint64_t RISC_context::read_memory(uint64_t address){
 }
 void RISC_context::write_memory(uint64_t address, uint64_t value){
     if(address > memory_lenght){
+        printf("while reading address %xl \n", address);
         error("trying to write higher than the memory limit \n");
         return;
     }
     uint64_t* content = (uint64_t*)&ram[address];
     *content = value;
 }
+
+
+
 void RISC_context::execute(){
     static int fallback = 0;
     printf("executing... \n");
     while(_current_idx < memory_lenght){
         _current_idx = next_idx;
-        next_idx += 0x4;
+        next_idx = _current_idx + 0x4;
+
         if(risc_expression_code(read_memory(_current_idx)).read_opcode() == 0){
-            continue;
+            error("opcode = 0");
+            return;;
 
         }
         risc_expression* exp = get_expression(risc_expression_code(read_memory(_current_idx)));
@@ -105,7 +112,7 @@ int RISC_context::init(){
 }
 void RISC_context::error(std::string error_code){
 
-    printf("[ RISC ] error : %s ", error_code.c_str());
+    printf("[ RISC ] error : %s  / line %xl \n", error_code.c_str(), _current_idx);
 
     //exit(1);
 }

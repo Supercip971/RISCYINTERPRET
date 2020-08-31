@@ -40,6 +40,8 @@ void interpreter::load_elf(){
         use_little_endian = true;
     }else if(header->e_ident[0x5] == 2){
         printf("file in big endian \n");
+        printf("we doesn't support BIG endian for the moment");
+        exit(2);
         use_little_endian = false;
 
     }else{
@@ -47,17 +49,13 @@ void interpreter::load_elf(){
         exit(2);
     }
     printf("loading elf 1 \n");
-    uint64_t elf_vaddr_start = 0;
-        uint64_t elf_vaddr_end = 0;
         printf("loading elf 2 \n");
     printf("table entry count : %i \n",(int) header->e_phnum);
     printf("loading elf 3 \n");
-    for(int table_entry = 0; table_entry < header->e_phnum; table_entry++, p_entry++){
+    for(int table_entry = 0; table_entry < header->e_phnum; table_entry++, p_entry ++ ){
 
         if (p_entry->p_type == PT_LOAD) {
             printf("loading valid elf entry \n");
-            elf_vaddr_start = p_entry->p_paddr;
-            elf_vaddr_end = p_entry->p_vaddr + p_entry->p_memsz;
 
             load_segment(p_entry->p_offset, p_entry->p_filesz, p_entry->p_vaddr, p_entry->p_memsz);
 

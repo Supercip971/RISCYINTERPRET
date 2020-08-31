@@ -14,7 +14,16 @@ public:
 
     risc_expression_code();
     risc_expression_code(uint32_t val);
-
+    static inline int32_t sign_extend32(uint32_t value, int signed_bit)
+    {
+        int32_t ret = value;
+        int bit_position = 0;
+        int32_t sign = (value >> signed_bit) & 1;
+        for (bit_position = signed_bit; bit_position <= 31; bit_position++) {
+            ret |= (sign << bit_position);
+        }
+        return ret;
+    }
     inline uint8_t read_opcode(){
         return raw_data & 0x7f;
         // 00000000000000000000000001111111
@@ -46,7 +55,7 @@ public:
     }
 
     inline uint32_t I_read_imm(){
-        return (raw_data & 0xfff00000) >> 20;
+        return (raw_data & 0b1111111111100000000000000000000) >> 20;
        // 11111111111100000000000000000000
     }
 
@@ -61,10 +70,19 @@ public:
     }
 
     inline uint32_t UJ_read_imm(){
-        return (raw_data & 0xfffff000) >> 12;
+        uint32_t result = 0;
+       result = (raw_data >> 21) & 0x3ff; // 10 bits
+        result |= ((raw_data >> 20) & 0x1) << 10; // 1 bit
+        result |= ((raw_data >> 12) & 0xff) << 11; // 8 bit
+       result |= ((raw_data >> 31) & 0x1) << 19; // 1 bit
+        return result;
         // 11111111111111111111000000000000
     }
-
+    inline uint8_t U_read_imm(){
+        return (raw_data>> 12) & 0xfffff ;
+       // 11111110000000000000000000000000
+       // 11111111111111111111000000000000
+    }
 
 
     // ---- compressed ----

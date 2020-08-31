@@ -66,10 +66,26 @@ NOT_IMPLEMENTED_EXPRESSION(I_sltiu_expression);
 
 
 // LOAD expression
+void I_lb_expression::execute(RISC_context* context, risc_expression_code code){
 
-NOT_IMPLEMENTED_EXPRESSION(I_lb_expression);
-NOT_IMPLEMENTED_EXPRESSION(I_lh_expression);
-NOT_IMPLEMENTED_EXPRESSION(I_lw_expression);
+    auto rs1 = context->get_register(code.read_rs1());
+    auto rd = context->get_register(code.read_rd());
+
+    rd->set(context->read_memoryT<uint8_t>(rs1->get() + code.I_read_imm()));
+}
+void I_lh_expression::execute(RISC_context* context, risc_expression_code code){
+
+    auto rs1 = context->get_register(code.read_rs1());
+    auto rd = context->get_register(code.read_rd());
+
+    rd->set(context->read_memoryT<uint16_t>(rs1->get() + code.I_read_imm()));
+}void I_lw_expression::execute(RISC_context* context, risc_expression_code code){
+
+    auto rs1 = context->get_register(code.read_rs1());
+    auto rd = context->get_register(code.read_rd());
+
+    rd->set(context->read_memoryT<uint32_t>(rs1->get() + code.I_read_imm()));
+}
 NOT_IMPLEMENTED_EXPRESSION(I_lbu_expression);
 NOT_IMPLEMENTED_EXPRESSION(I_lhu_expression);
 
@@ -92,24 +108,48 @@ NOT_IMPLEMENTED_EXPRESSION(B_bgeu_expression);
 void J_jal_expression::execute(RISC_context* context, risc_expression_code code){
 
     RISC_register* rd = context->get_register(code.read_rd());
+   int64_t   dest =code.UJ_read_imm() ;
+
     rd->set(context->next_idx);
 
-    context->next_idx = context->next_idx ;
-    printf("jumping (before %x) %x \n", context->_current_idx, context->next_idx);
+    context->next_idx =context->_current_idx + risc_expression_code::sign_extend32((dest ) << 1, 20) ;
+    printf("jumping (jal) (before %x) %x \n", context->_current_idx, context->next_idx);
 }
 
 
-NOT_IMPLEMENTED_EXPRESSION(I_jalr_expression);
+void I_jalr_expression::execute(RISC_context* context, risc_expression_code code){
+
+    RISC_register* rd = context->get_register(code.read_rd());
+    RISC_register* rs1 = context->get_register(code.read_rs1());
+    int64_t dest =code.I_read_imm();
+    rd->set(context->next_idx);
+
+    context->next_idx = rs1->get() + dest ;
+    printf("jumping (jalr) (before %x) %x \n", context->_current_idx, context->next_idx);
+   }
+
 
 // OTHER
 
-NOT_IMPLEMENTED_EXPRESSION(U_lui_expression);
+void U_lui_expression::execute(RISC_context* context, risc_expression_code code){
+    RISC_register* rd = context->get_register(code.read_rd());
+     uint64_t imm =code.U_read_imm();
+
+     printf("%s (%i) = %s (%i) \n",
+            rd->get_abi().c_str(),
+            rd->get(),
+            "imm",
+            imm );
+
+     rd->set( imm);
+
+}
 
 void U_auipc_expression::execute(RISC_context* context, risc_expression_code code){
     RISC_register* rd = context->get_register(code.read_rd());
-     uint64_t imm =code.UJ_read_imm();
+     uint64_t imm =code.U_read_imm();
 
-     printf("%s (%i) = %s (%i) + %s (%i) \n",
+     printf("[ auipc ] %s (%i) = %s (%i) + %s (%i) \n",
             rd->get_abi().c_str(),
             rd->get(),
             "PC",
@@ -145,6 +185,7 @@ NOT_IMPLEMENTED_EXPRESSION(C_beqz_expression);
 NOT_IMPLEMENTED_EXPRESSION(C_bnez_expression);
 NOT_IMPLEMENTED_EXPRESSION(C_li_expression);
 NOT_IMPLEMENTED_EXPRESSION(C_lui_expression);
+
 void C_addi_expression::execute(RISC_context *context, risc_expression_code code){
     RISC_register* rd = context->get_register(code.CRI_read_rd());
     uint64_t finnal_imm = code.CRISB_read_limm();
