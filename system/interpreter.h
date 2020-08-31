@@ -23,7 +23,7 @@ public:
     void load_elf();
     void init_ram();
     void start();
-    void load(std::string file_path);
+    void load(std::string file_path, char** argv, int argc);
 };
 
 #endif // INTERPRETER_H

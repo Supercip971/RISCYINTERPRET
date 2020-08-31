@@ -45,7 +45,7 @@ public:
        // 11111110000000000000000000000000
     }
 
-    inline uint8_t I_read_imm(){
+    inline uint32_t I_read_imm(){
         return (raw_data & 0xfff00000) >> 20;
        // 11111111111100000000000000000000
     }
@@ -60,9 +60,54 @@ public:
        // 11111110000000000000000000000000
     }
 
-    inline uint8_t UJ_read_imm(){
+    inline uint32_t UJ_read_imm(){
         return (raw_data & 0xfffff000) >> 12;
         // 11111111111111111111000000000000
+    }
+
+
+
+    // ---- compressed ----
+
+
+    inline uint16_t C_read_op(){
+        return (raw_data & 0x3);
+        // 0000000000000011
+    }
+    inline uint16_t CSLW_read_rds2(){
+        return (raw_data & 0x1c) >> 2;
+        // 0000000000011100
+    }
+    inline uint16_t CSL_read_limm(){ // funct3 with inter register operation
+        return (raw_data & 0x60) >> 5;
+        // 0000000001100000
+    }inline uint16_t CSLB_read_rs1(){
+        return (raw_data & 0x380) >> 7;
+        // 0000001110000000
+    }inline uint16_t CSL_read_himm(){  // funct3 with inter register operation
+        return (raw_data & 0x1c00) >> 10;
+        // 0001110000000000
+    }inline uint16_t CISWLSBJ_read_funct3(){ // yeah everything but no CR why ?
+        return (raw_data & 0xe000) >> 13;
+        // 1110000000000000
+    }
+    inline uint16_t CS_read_funct6(){
+        return (raw_data & 0xfc00) >> 10;
+        // 1111110000000000
+    }
+
+    inline uint16_t CRISB_read_limm(){ // or rs2
+        return (raw_data & 0b0000000001111100) >> 2; // to do : change everything into binary code as it is more readable
+
+    }
+
+    inline uint16_t CI_read_himm(){
+        return (raw_data & 0b0001000000000000) >> 12; // to do : change everything into binary code as it is more readable
+
+    }
+    inline uint16_t CRI_read_rd(){ // or rs1
+        return (raw_data & 0b0000111110000000) >> 7; // to do : change everything into binary code as it is more readable
+
     }
 };
 
@@ -135,3 +180,32 @@ DEFINE_EXPRESSION(U_auipc_expression);
 
 DEFINE_EXPRESSION(I_ecall_expression);
 DEFINE_EXPRESSION(I_ebreak_expression);
+
+
+DEFINE_EXPRESSION(C_lwsp_expression);
+DEFINE_EXPRESSION(C_swsp_expression);
+DEFINE_EXPRESSION(C_lw_expression);
+DEFINE_EXPRESSION(C_sw_expression);
+DEFINE_EXPRESSION(C_j_expression);
+DEFINE_EXPRESSION(C_jal_expression);
+DEFINE_EXPRESSION(C_jr_expression);
+DEFINE_EXPRESSION(C_jalr_expression);
+DEFINE_EXPRESSION(C_beqz_expression);
+DEFINE_EXPRESSION(C_bnez_expression);
+DEFINE_EXPRESSION(C_li_expression);
+DEFINE_EXPRESSION(C_lui_expression);
+DEFINE_EXPRESSION(C_addi_expression);
+DEFINE_EXPRESSION(C_addi16_expression);
+DEFINE_EXPRESSION(C_addi4_expression);
+DEFINE_EXPRESSION(C_slli_expression);
+DEFINE_EXPRESSION(C_srli_expression);
+DEFINE_EXPRESSION(C_srai_expression);
+DEFINE_EXPRESSION(C_andi_expression);
+DEFINE_EXPRESSION(C_mv_expression);
+DEFINE_EXPRESSION(C_add_expression);
+DEFINE_EXPRESSION(C_and_expression);
+DEFINE_EXPRESSION(C_or_expression);
+DEFINE_EXPRESSION(C_xor_expression);
+DEFINE_EXPRESSION(C_sub_expression);
+DEFINE_EXPRESSION(C_nop_expression);
+DEFINE_EXPRESSION(C_ebreak_expression);

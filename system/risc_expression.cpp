@@ -1,4 +1,65 @@
 #include <system/risc_assembly_expression.h>
+
+risc_expression* get_expression_compressed_10(risc_expression_code execute_code){
+    // for the moment we won't support these expressions
+    switch (execute_code.CISWLSBJ_read_funct3()) { // maybe doing an array would be faster ?
+        case OP01_LWSP:
+            return(risc_expression*) (new C_lwsp_expression());
+        case OP01_SWSP:
+            return(risc_expression*) (new C_swsp_expression());
+        case OP01_SLLI:
+            return(risc_expression*) (new C_slli_expression());
+        default:
+                printf("un handled COMPRESS expression OPCODE %i | %i \n", execute_code.C_read_op(), execute_code.CISWLSBJ_read_funct3());
+    }
+    return nullptr;
+}
+risc_expression* get_expression_compressed_00(risc_expression_code execute_code){
+    switch (execute_code.CISWLSBJ_read_funct3()) { // maybe doing an array would be faster ?
+
+        default:
+                printf("un handled COMPRESS expression OPCODE %i | %i \n", execute_code.C_read_op(), execute_code.CISWLSBJ_read_funct3());
+    }
+    return nullptr;
+}
+
+risc_expression* get_expression_compressed_01_100(risc_expression_code execute_code){
+    switch (execute_code.CS_read_funct6()) { // maybe doing an array would be faster ?
+        case 0b100011:
+            if(execute_code.CSL_read_limm() == 0b11){
+                 return(risc_expression*) (new C_and_expression());
+            }else if(execute_code.CSL_read_limm() == 0b10){
+                return(risc_expression*) (new C_or_expression());
+            }else if(execute_code.CSL_read_limm() == 0b01){
+                return(risc_expression*) (new C_xor_expression());
+            }else{
+                return(risc_expression*) (new C_sub_expression());
+            }
+            // here are sub add etc expression
+        default:
+                printf("un handled COMPRESS expression OPCODE f6 = %i | %i \n", execute_code.CS_read_funct6(), execute_code.CISWLSBJ_read_funct3());
+    }
+    return nullptr;
+}
+risc_expression* get_expression_compressed_01_000(risc_expression_code execute_code){
+    if(execute_code.CRI_read_rd() == 0){
+         return(risc_expression*) (new C_nop_expression());
+    }else{
+        return (risc_expression*)(new C_addi_expression());
+    }
+    return nullptr;
+}
+risc_expression* get_expression_compressed_01(risc_expression_code execute_code){
+    switch (execute_code.CISWLSBJ_read_funct3()) { // maybe doing an array would be faster ?
+        case 0b100:
+            return get_expression_compressed_01_100(execute_code);
+        case 0b000:
+            return get_expression_compressed_01_000(execute_code);
+        default:
+                printf("un handled COMPRESS expression OPCODE op = %i | f3 = %i \n", execute_code.C_read_op(), execute_code.CISWLSBJ_read_funct3());
+    }
+    return nullptr;
+}
 risc_expression* get_expression_51(risc_expression_code execute_code){
     switch (execute_code.read_f3()) { // maybe doing an array would be faster ?
         case O51_ADD: // or sub
@@ -38,7 +99,7 @@ risc_expression* get_expression_51(risc_expression_code execute_code){
             return(risc_expression*) (new R_sltu_expression());
             break;
         default:
-            printf("un handled expression OPCODE %i/%i \n", execute_code.read_opcode(), execute_code.read_f3());
+            printf("un handled expression OPCODE %i / %i \n", execute_code.read_opcode(), execute_code.read_f3());
     }
     return nullptr;
 }
@@ -78,7 +139,7 @@ risc_expression* get_expression_19(risc_expression_code execute_code){
             return(risc_expression*) (new I_sltiu_expression());
             break;
         default:
-                printf("un handled expression OPCODE %i/%i \n", execute_code.read_opcode(), execute_code.read_f3());
+                printf("un handled expression OPCODE %i / %i \n", execute_code.read_opcode(), execute_code.read_f3());
     }
     return nullptr;
 }
@@ -106,7 +167,7 @@ risc_expression* get_expression_3(risc_expression_code execute_code){
             break;
 
         default:
-                printf("un handled expression OPCODE %i/%i \n", execute_code.read_opcode(), execute_code.read_f3());
+                printf("un handled expression OPCODE %i / %i \n", execute_code.read_opcode(), execute_code.read_f3());
     }
     return nullptr;
 }
@@ -126,7 +187,7 @@ risc_expression* get_expression_35(risc_expression_code execute_code){
 
 
         default:
-                printf("un handled expression OPCODE %i/%i \n", execute_code.read_opcode(), execute_code.read_f3());
+                printf("un handled expression OPCODE %i / %i \n", execute_code.read_opcode(), execute_code.read_f3());
     }
     return nullptr;
 }
@@ -151,7 +212,7 @@ risc_expression* get_expression_99(risc_expression_code execute_code){
             return(risc_expression*) (new B_bgeu_expression());
             break;
         default:
-                printf("un handled expression OPCODE %i/%i \n", execute_code.read_opcode(), execute_code.read_f3());
+                printf("un handled expression OPCODE %i / %i \n", execute_code.read_opcode(), execute_code.read_f3());
     }
     return nullptr;
 }
@@ -184,7 +245,20 @@ risc_expression* get_expression(risc_expression_code execute_code){
         return get_expression_19(execute_code);
     }else if(execute_code.read_opcode() == 0b000011){
         return get_expression_3(execute_code);
-    }else {
+    }else if(execute_code.C_read_op()  < 0b11){
+        if(execute_code.C_read_op() == 0b01){
+            return get_expression_compressed_01(execute_code);
+        }
+        else if(execute_code.C_read_op() == 0b00){
+            return get_expression_compressed_00(execute_code);
+        }
+        else if(execute_code.C_read_op() == 0b10){
+            return get_expression_compressed_10(execute_code);
+        }else{
+            return 0x0; // why you are even here ?
+        }
+    }
+    else {
         return get_expression_MISC(execute_code);
     }
     return 0x0;

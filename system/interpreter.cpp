@@ -73,9 +73,11 @@ void interpreter::start(){
     printf("executing context \n");
     context.execute();
 }
-void interpreter::load(std::string file_path){
+void interpreter::load(std::string file_path, char** argv, int argc){
 
+    for(int i = 0; i < argc; i++){
 
+    }
 
     printf("loading %s \n", file_path.c_str());
 
@@ -111,7 +113,7 @@ void interpreter::load(std::string file_path){
                 interpreter_raw_data = new uint8_t[file_size];
                 myfile.seekg (0, std::ios::beg);
                 myfile.read((char*)interpreter_raw_data,file_size);
-
+                ram_size += file_size;
                 printf("reading file : OK \n");
                 init_ram();
                 printf("init ram : OK \n");

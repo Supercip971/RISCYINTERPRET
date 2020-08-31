@@ -10,7 +10,7 @@ int main(int argc, char** argv){
         return 1;
     }else{
         interpreter interpret;
-        interpret.load(std::string(argv[1]));
+        interpret.load(std::string(argv[1]), argv, argc);
     }
 
 

@@ -56,6 +56,11 @@ enum OPMISC_instruction{ // here we only count the OP_code
     OPMISC_ECALL = 115, // with imm = 0x0
     OPMISC_EBREAK = 115, // with imm = 0x1 but we doesn't support break yet
 };
+enum OPC_instruction{ // here we only count the OP_code
+    OP01_LWSP = 2,
+    OP01_SWSP = 6,
+    OP01_SLLI = 0,
+};
 class risc_expression;
 class risc_expression_code;
 

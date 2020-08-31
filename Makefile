@@ -17,7 +17,7 @@ all: $(OBJFILES)
 	$(GCC) $(OBJFILES) -o build/RISCYINTERPRETER 
 	@make run
 run:
-	./build/RISCYINTERPRETER helloworld
+	./build/RISCYINTERPRETER riscHELLO.rexe
 make_elf:
 	
 

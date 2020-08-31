@@ -40,13 +40,12 @@ void RISC_context::write_memory(uint64_t address, uint64_t value){
 }
 void RISC_context::execute(){
     static int fallback = 0;
-    printf("executing...");
+    printf("executing... \n");
     while(_current_idx < memory_lenght){
         _current_idx = next_idx;
         next_idx += 0x4;
         if(risc_expression_code(read_memory(_current_idx)).read_opcode() == 0){
-
-                return;
+            continue;
 
         }
         risc_expression* exp = get_expression(risc_expression_code(read_memory(_current_idx)));
