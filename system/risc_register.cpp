@@ -1,100 +1,122 @@
-#include <system/risc_register.h>
 #include <stdio.h>
+#include <system/risc_register.h>
 RISC_register::RISC_register()
 {
-
 }
-void RISC_register::set(uint64_t value){
+void RISC_register::set(uint64_t value)
+{
     base_value = value;
 }
-uint64_t RISC_register::get(){
+uint64_t RISC_register::get()
+{
     return base_value;
 };
 
-
-std::string RISC_register::get_abi(){
+std::string RISC_register::get_abi()
+{
     return std::string("null register"); // oof
 }
-void  RISC_register::init(){
+void RISC_register::init()
+{
     base_value = 0; // oof
 }
 
-
-
 // ------- X0 REGISTER -------
 
-x0_register::x0_register(){
+x0_register::x0_register()
+{
     base_value = 0x0;
 }
-void x0_register::set(uint64_t value){
+void x0_register::set(uint64_t value)
+{
     //parent_data->error("trying to change x0 value");
-  //  base_value = value;
+    //  base_value = value;
 }
 
-uint64_t x0_register:: get() {
+uint64_t x0_register::get()
+{
     return 0x0; // everytime x0 is 0
 }
-std::string x0_register:: get_abi(){
+std::string x0_register::get_abi()
+{
 
     return std::string("zero");
 }
 
- // ------- X1 REGISTER -------
+// ------- X1 REGISTER -------
 
-x1_register::x1_register(){
+x1_register::x1_register()
+{
 }
-void x1_register::init(){
+void x1_register::init()
+{
     base_value = 0;
 }
-std::string x1_register::get_abi(){
+std::string x1_register::get_abi()
+{
     return std::string("ra");
 }
 
 // ------- X2 REGISTER -------
 
-x2_register::x2_register(){
+x2_register::x2_register()
+{
     base_value = 0x0;
 }
-void x2_register::set(uint64_t value){
-    if((value / 16) * 16 != value ){
+void x2_register::set(uint64_t value)
+{
+    if ((value / 16) * 16 != value)
+    {
 
         parent_data->error("trying to change x2 value with an un aligned address");
-    }else if(value == 0){
+    }
+    else if (value == 0)
+    {
 
         parent_data->error("trying to change x2 value with a 0x0 address");
-    }else{
+    }
+    else
+    {
         parent_data->stack = value;
     }
-  //  base_value = value;
+    //  base_value = value;
 }
 
-uint64_t x2_register:: get() {
+uint64_t x2_register::get()
+{
     return parent_data->stack; // everytime x0 is 0
 }
-std::string x2_register:: get_abi(){
+std::string x2_register::get_abi()
+{
     return std::string("sp");
 }
-void x2_register:: init(){
+void x2_register::init()
+{
     base_value = 0;
 }
 // ------- X3 REGISTER -------
 
-x3_register::x3_register(){
+x3_register::x3_register()
+{
 }
-void x3_register::init(){
-   base_value = 0;
+void x3_register::init()
+{
+    base_value = 0;
 }
-std::string x3_register::get_abi(){
-   return std::string("gp");
+std::string x3_register::get_abi()
+{
+    return std::string("gp");
 }
 
 // ------- X4 REGISTER -------
 
-x4_register::x4_register(){
+x4_register::x4_register()
+{
 }
 
-std::string x4_register::get_abi(){
-   return std::string("tp");
+std::string x4_register::get_abi()
+{
+    return std::string("tp");
 }
 // ------- X5 REGISTER -------
 SIMPLE_REGISTER_CODE(x5_register, "t0");

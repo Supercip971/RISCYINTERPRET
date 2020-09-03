@@ -22,6 +22,7 @@ debug:
 	./build/RISCYINTERPRETER riscHELLO.rexe -con
 make_elf:
 	
-
+format:
+	clang-format -i --verbose --style=file $(SRCFILES) $(HDRFILES)
 clear:
 	rm $(OBJFILES)

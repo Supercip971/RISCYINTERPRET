@@ -4,95 +4,89 @@
 #include <string>
 #include <system/risc_context.h>
 
-#define SIMPLE_REGISTER_HEADER(name) \
-    class name : public RISC_register { \
-    public: \
-    name(); \
-    std::string get_abi(); \
- };
+#define SIMPLE_REGISTER_HEADER(name)  \
+    class name : public RISC_register \
+    {                                 \
+    public:                           \
+        name();                       \
+        std::string get_abi();        \
+    };
 
 #define SIMPLE_REGISTER_CODE(name, sabi) \
-    name::name(){}; \
-std::string name::get_abi(){ return std::string(sabi);};
-
+    name::name(){};                      \
+    std::string name::get_abi() { return std::string(sabi); };
 
 class RISC_context;
 class RISC_register
 {
 protected:
     uint64_t base_value = 0;
+
 public:
-    RISC_context* parent_data;
+    RISC_context *parent_data;
     RISC_register();
     void error();
 
-    virtual void set(uint64_t value) ;
-    virtual uint64_t get() ;
+    virtual void set(uint64_t value);
+    virtual uint64_t get();
     virtual std::string get_abi();
     virtual void init();
-
-
 };
 
 // ------- X0 REGISTER -------
 
-class x0_register : public RISC_register {
+class x0_register : public RISC_register
+{
 public:
     x0_register();
     void set(uint64_t value) override;
     uint64_t get() override;
     std::string get_abi() override;
-
 };
-
 
 // ------- X1 REGISTER -------
 
-class x1_register : public RISC_register {
+class x1_register : public RISC_register
+{
 
 public:
-
     x1_register();
     std::string get_abi() override;
     void init() override;
-
 };
 
 // ------- X2 REGISTER -------
 
-class x2_register : public RISC_register {
+class x2_register : public RISC_register
+{
 
 public:
-
     x2_register();
     void set(uint64_t value) override;
     uint64_t get() override;
     std::string get_abi() override;
     void init() override;
-
 };
 
 // ------- X3 REGISTER -------
 
-
-class x3_register : public RISC_register {
+class x3_register : public RISC_register
+{
 
 public:
-
     x3_register();
     std::string get_abi() override;
-;
+    ;
     void init() override;
-
 };
 
 // ------- X4 REGISTER -------
 
-class x4_register : public RISC_register {
+class x4_register : public RISC_register
+{
 public:
     x4_register();
     std::string get_abi() override;
-
 };
 
 SIMPLE_REGISTER_HEADER(x5_register);
