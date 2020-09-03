@@ -42,24 +42,46 @@ void RISC_context::write_memory(uint64_t address, uint64_t value){
 }
 
 
+void RISC_context::execute_once(){
+    if(ended == true){
+        return;
+    }
+    _current_idx = next_idx;
+    next_idx = _current_idx + 0x4;
 
+      if(risc_expression_code(read_memory(_current_idx)).read_opcode() == 0){
+        error("opcode = 0");
+        ended = true;
+        next_idx = _current_idx;
+        return;;
+
+    }
+    risc_expression_code code = risc_expression_code(read_memory(_current_idx));
+    code.where = _current_idx;
+    risc_expression* exp = get_expression(code);
+    if(exp == nullptr){
+        if(code.C_read_op() != 0b11){
+            printf("in line : %x, with data %x (compressed expression)\n", _current_idx,(uint16_t) code.raw_data);
+
+        }else{
+            printf("in line : %x, with data %x \n", _current_idx, code.raw_data);
+
+        }
+        error("RISC expression not found :(");
+        ended = true;
+        return;
+    }
+
+    printf("executing %s, line : %x \n", exp->get_name().c_str(), _current_idx);
+
+    exp->execute(this, (code));
+
+    delete(exp);
+}
 void RISC_context::execute(){
-    static int fallback = 0;
-    printf("executing... \n");
-    while(_current_idx < memory_lenght){
-        _current_idx = next_idx;
-        next_idx = _current_idx + 0x4;
+     while(_current_idx < memory_lenght){
 
-        if(risc_expression_code(read_memory(_current_idx)).read_opcode() == 0){
-            error("opcode = 0");
-            return;;
-
-        }
-        risc_expression* exp = get_expression(risc_expression_code(read_memory(_current_idx)));
-        if(exp != nullptr){
-            exp->execute(this, risc_expression_code(read_memory(_current_idx)));
-        }
-        delete(exp);
+       execute_once();
     }
 }
 int RISC_context::init(){

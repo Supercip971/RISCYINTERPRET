@@ -1,6 +1,7 @@
 #pragma once
 #include <system/risc_register.h>
 #include <stdint.h>
+#include <mutex>
 class RISC_register;
 class RISC_context
 {
@@ -8,10 +9,10 @@ class RISC_context
     uint8_t* ram;
     uint64_t memory_lenght;
 public:
-
+    std::mutex * parent_mutex;
     uint64_t read_memory(uint64_t address);
     void write_memory(uint64_t address, uint64_t value);
-
+    bool ended = false;
     // these are used for load and store instructions
     // template T need to be in a header for the compiler
     // or in a different HEADER file
@@ -36,7 +37,7 @@ public:
     RISC_register* x_regs[32];
     RISC_register* f_regs[32]; // unused
     uint64_t _current_idx = 0;
-
+    void execute_once();
 
     RISC_register* get_register(uint32_t id);
     uint64_t stack = 0;

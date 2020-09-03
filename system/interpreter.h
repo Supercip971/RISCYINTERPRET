@@ -3,8 +3,9 @@
 #include <string>
 #define MAX_FILE_SIZE 100000000
 #include <elf.h>
-
-
+#include <mutex>
+#include <future>
+#include <system/risc_context.h>
 class interpreter
 {
 
@@ -14,6 +15,7 @@ class interpreter
     uint64_t ram_size = 0x1000000; // 16m default ram size
     uint64_t data_lenght;
     uint64_t start_addr;
+    RISC_context context;
     bool use_little_endian = false;
     void swap_little_endian();
     void load_segment(uint64_t source, uint64_t size, uint64_t dest, uint64_t destsize);
@@ -22,6 +24,7 @@ public:
 
     void load_elf();
     void init_ram();
+
     void start();
     void load(std::string file_path, char** argv, int argc);
 };

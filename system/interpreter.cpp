@@ -6,11 +6,13 @@
 #include <cstring>
 #include <system/risc_context.h>
 #include <byteswap.h>
-
+#include <stdio.h>
+#include <iostream>
+#include <chrono>
+#include <cstring>
 
 interpreter::interpreter()
 {
-
 }
 void interpreter::swap_little_endian(){
 
@@ -64,13 +66,17 @@ void interpreter::load_elf(){
     }
 }
 void interpreter::start(){
-    RISC_context context;
+
+   // main_mutex.lock();
     context = RISC_context(start_addr, (void*)interpreter_ram, ram_size);
     printf("loading context \n");
     context.init();
     printf("executing context \n");
+  //  main_mutex.unlock();
     context.execute();
 }
+
+
 void interpreter::load(std::string file_path, char** argv, int argc){
 
     for(int i = 0; i < argc; i++){

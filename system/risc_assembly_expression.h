@@ -24,6 +24,13 @@ public:
         }
         return ret;
     }
+    inline uint64_t x(int lo, int len) { return (raw_data >> lo) & ((uint64_t(1) << len)-1); }
+    uint64_t xs(int lo, int len) { return int64_t(raw_data) << (64-lo-len) >> (64-len); }
+    inline uint64_t read_data(uint64_t from, uint64_t lenght){
+        uint64_t result = raw_data;
+        raw_data >>= lenght;
+        return result;
+    }
     inline uint8_t read_opcode(){
         return raw_data & 0x7f;
         // 00000000000000000000000001111111
@@ -59,6 +66,7 @@ public:
        // 11111111111100000000000000000000
     }
 
+
     inline uint8_t SB_read_imm_start(){
         return (raw_data & 0xf8) >> 7;
         // 00000000000000000000111110000000
@@ -68,20 +76,34 @@ public:
         return (raw_data & 0xfe000000) >> 25;
        // 11111110000000000000000000000000
     }
-
-    inline uint32_t UJ_read_imm(){
-        uint32_t result = 0;
-       result = (raw_data >> 21) & 0x3ff; // 10 bits
-        result |= ((raw_data >> 20) & 0x1) << 10; // 1 bit
-        result |= ((raw_data >> 12) & 0xff) << 11; // 8 bit
-       result |= ((raw_data >> 31) & 0x1) << 19; // 1 bit
-        return result;
-        // 11111111111111111111000000000000
-    }
     inline uint8_t U_read_imm(){
         return (raw_data>> 12) & 0xfffff ;
        // 11111110000000000000000000000000
        // 11111111111111111111000000000000
+    }
+
+
+    // here i put every odd thing, when i see them i want to die
+
+
+    inline uint32_t UJ_read_imm(){
+        uint32_t result = 0;
+       result  = ( raw_data >> 21) & 0x3ff; // 10 bits
+       result |= ((raw_data >> 20) & 0x1) << 10; // 1 bit
+       result |= ((raw_data >> 12) & 0xff) << 11; // 8 bit
+       result |= ((raw_data >> 31) & 0x1) << 19; // 1 bit
+        return result;
+    }
+    inline uint32_t B_read_imm(){
+        uint32_t result = 0;
+
+         result  = ((raw_data >> (31 - 12)) & (1 << 12));
+         result |= ((raw_data >> (25 - 5))  & 0x7e0);
+         result |= ((raw_data >> (8 - 1))   & 0x1e);
+         result |= ((raw_data << (11 - 7))  & (1 << 11));
+         result |= ( raw_data << 19) >> 19;
+
+         return result;
     }
 
 
@@ -108,6 +130,9 @@ public:
     }inline uint16_t CISWLSBJ_read_funct3(){ // yeah everything but no CR why ?
         return (raw_data & 0xe000) >> 13;
         // 1110000000000000
+    }inline uint16_t CR_read_funct4(){ // yeah everything but no CR why ?
+        return (raw_data & 0b1111000000000000) >> 12;
+        // 1111000000000000
     }
     inline uint16_t CS_read_funct6(){
         return (raw_data & 0xfc00) >> 10;
@@ -127,6 +152,17 @@ public:
         return (raw_data & 0b0000111110000000) >> 7; // to do : change everything into binary code as it is more readable
 
     }
+    inline uint16_t CANDI_read_func2(){ // or rs1
+        return (raw_data & 0b0000110000000000) >> 10; // to do : change everything into binary code as it is more readable
+
+    }
+    inline uint64_t worst_imm_ever(){
+        // when i see that i just want to die >:(
+        return (x(3, 2) << 1) + (x(10, 2) << 3) + (x(2, 1) << 5) + (x(5, 2) << 6) + (xs(12, 1) << 8);
+    }
+
+    inline uint64_t c_lw_imm() { return (x(6, 1) << 2) + (x(10, 3) << 3) + (x(5, 1) << 6); }
+    inline uint64_t c_ld_imm() { return (x(10, 3) << 3) + (x(5, 2) << 6); }
 };
 
 
@@ -135,7 +171,9 @@ class risc_expression
 {
 public:
     risc_expression();
-
+    inline virtual std::string get_name(){
+        return std::string("null risc expression");
+    };
     virtual void execute(RISC_context* context, risc_expression_code code);
 };
 
@@ -143,6 +181,9 @@ public:
 #define DEFINE_EXPRESSION(name) \
     class name :public risc_expression { \
     public: \
+    inline std::string get_name() override{ \
+         return std::string(#name);   \
+    } \
     void execute(RISC_context* context, risc_expression_code code) override; \
     };
 // add expression
